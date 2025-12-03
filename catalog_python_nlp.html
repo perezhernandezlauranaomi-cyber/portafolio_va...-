@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenguaje Natural - Catálogo de Tareas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%234f46e5;stop-opacity:1" /><stop offset="100%" style="stop-color:%237c3aed;stop-opacity:1" /></linearGradient></defs><rect fill="url(%23grad)" width="1200" height="600"/><g fill="white" opacity="0.1"><circle cx="100" cy="100" r="80"/><circle cx="300" cy="400" r="120"/><circle cx="800" cy="150" r="100"/><circle cx="1000" cy="450" r="90"/><path d="M200,300 Q400,200 600,300 T1000,300" stroke="white" stroke-width="3" fill="none"/><text x="600" y="300" font-size="120" text-anchor="middle" font-family="Arial">AI</text></g></svg>');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(79, 70, 229, 0.3), transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(124, 58, 237, 0.3), transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .hero .student-name {
+            font-size: 1.8rem;
+            margin-top: 1rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.95;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            font-size: 2.5rem;
+            color: white;
+            opacity: 0.8;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-20px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-10px) translateX(-50%);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            background: #f0f2f5;
+        }
+
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 2rem;
+            font-weight: 600;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 50px;
+            background: linear-gradient(180deg, #4f46e5, #7c3aed);
+            border-radius: 3px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(79, 70, 229, 0.3);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            opacity: 0.9;
+        }
+
+        .card-image span {
+            position: relative;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card-description {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .card-button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeInModal 0.3s ease;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: #94a3b8;
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            background: #f1f5f9;
+            color: #4f46e5;
+            transform: rotate(90deg);
+        }
+
+        .modal h2 {
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            padding-right: 3rem;
+        }
+
+        .modal pre {
+            background: #1e293b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            border-left: 5px solid #4f46e5;
+            margin: 1rem 0;
+        }
+
+        .modal code {
+            font-family: 'Courier New', monospace;
+            color: #22d3ee;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero .student-name {
+                font-size: 1.2rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 2rem;
+            }
+        }
+
+        .gradient-bg-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-bg-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .gradient-bg-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .gradient-bg-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .gradient-bg-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .gradient-bg-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Lenguaje Natural</h1>
+            <p class="student-name">Pérez Hernández Laura Naomi</p>
+        </div>
+        <div class="scroll-indicator">↓</div>
+    </section>
+
+    <div class="container">
+        <!-- CHATBOTS CON PLN -->
+        <div class="section">
+            <h2 class="section-title">Chatbots con PLN</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-image gradient-bg-1">
+                        <span>🤖</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">NLTK</h3>
+                        <p class="card-description">Natural Language Toolkit es una plataforma líder para construir programas Python que trabajen con datos de lenguaje humano. Proporciona interfaces para más de 50 corpus y recursos léxicos.</p>
+                        <button class="card-button" onclick="showModal('nltk')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-2">
+                        <span>💬</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">spaCy</h3>
+                        <p class="card-description">Biblioteca industrial de procesamiento de lenguaje natural en Python. Diseñada específicamente para producción, ofrece análisis sintáctico, reconocimiento de entidades y modelos estadísticos.</p>
+                        <button class="card-button" onclick="showModal('spacy')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-3">
+                        <span>📝</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">TextBlob</h3>
+                        <p class="card-description">Biblioteca simple para procesamiento de texto que proporciona una API consistente para tareas comunes de PLN como análisis de sentimientos, clasificación y traducción.</p>
+                        <button class="card-button" onclick="showModal('textblob')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHATBOTS CON IA -->
+        <div class="section">
+            <h2 class="section-title">Chatbots con IA</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-image gradient-bg-4">
+                        <span>🧠</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Transformers</h3>
+                        <p class="card-description">Biblioteca de Hugging Face con modelos preentrenados de última generación como BERT, GPT, T5 y más. Permite crear chatbots inteligentes con comprensión contextual avanzada.</p>
+                        <button class="card-button" onclick="showModal('transformers')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-5">
+                        <span>🎯</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Rasa</h3>
+                        <p class="card-description">Framework de código abierto para construir asistentes conversacionales con machine learning. Incluye NLU, gestión de diálogos y aprendizaje por refuerzo.</p>
+                        <button class="card-button" onclick="showModal('rasa')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-6">
+                        <span>🎓</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">ChatterBot</h3>
+                        <p class="card-description">Biblioteca de machine learning que facilita la creación de chatbots conversacionales. Aprende automáticamente de las conversaciones y mejora sus respuestas con el tiempo.</p>
+                        <button class="card-button" onclick="showModal('chatterbot')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHATBOTS CONECTADOS A PLATAFORMAS -->
+        <div class="section">
+            <h2 class="section-title">Chatbots Conectados a Plataformas</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-image gradient-bg-1">
+                        <span>📱</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Twilio</h3>
+                        <p class="card-description">API para integrar chatbots con WhatsApp, SMS, y otros canales de mensajería. Permite crear experiencias conversacionales omnicanal con facilidad.</p>
+                        <button class="card-button" onclick="showModal('twilio')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-2">
+                        <span>💚</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">python-telegram-bot</h3>
+                        <p class="card-description">Wrapper completo de la API de Telegram Bot. Permite crear bots interactivos con comandos, teclados personalizados y manejo de multimedia.</p>
+                        <button class="card-button" onclick="showModal('telegram')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-3">
+                        <span>🤝</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">python-slack-sdk</h3>
+                        <p class="card-description">SDK oficial de Slack para Python. Permite crear bots que interactúen con usuarios, canales y eventos en tiempo real dentro de Slack.</p>
+                        <button class="card-button" onclick="showModal('slack')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHATBOTS EN PÁGINAS WEB -->
+        <div class="section">
+            <h2 class="section-title">Chatbots en Páginas Web</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-image gradient-bg-4">
+                        <span>🌐</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Flask + Socket.IO</h3>
+                        <p class="card-description">Combinación perfecta para crear chatbots web en tiempo real. Flask proporciona el backend y Socket.IO la comunicación bidireccional instantánea.</p>
+                        <button class="card-button" onclick="showModal('flask')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-5">
+                        <span>⚡</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">FastAPI + WebSockets</h3>
+                        <p class="card-description">Framework moderno de alto rendimiento para crear APIs con soporte nativo de WebSockets. Ideal para chatbots web rápidos y escalables.</p>
+                        <button class="card-button" onclick="showModal('fastapi')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image gradient-bg-6">
+                        <span>🎨</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Streamlit</h3>
+                        <p class="card-description">Framework para crear aplicaciones web interactivas de forma rápida. Perfecto para prototipos de chatbots y demos con interfaces atractivas.</p>
+                        <button class="card-button" onclick="showModal('streamlit')">Ver la Instalación de las Librerías</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const installations = {
+            nltk: {
+                title: 'NLTK - Natural Language Toolkit',
+                content: `# Instalación básica
+pip install nltk
+
+# Descargar recursos necesarios
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
+nltk.download('stopwords')
+
+# Ejemplo de uso básico
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+
+text = "El procesamiento de lenguaje natural es fascinante"
+tokens = word_tokenize(text)
+print(tokens)`
+            },
+            spacy: {
+                title: 'spaCy',
+                content: `# Instalación básica
+pip install spacy
+
+# Descargar modelo en español
+python -m spacy download es_core_news_sm
+python -m spacy download es_core_news_md
+
+# Descargar modelo en inglés
+python -m spacy download en_core_web_sm
+
+# Ejemplo de uso
+import spacy
+nlp = spacy.load("es_core_news_sm")
+doc = nlp("Laura estudia procesamiento de lenguaje natural")
+for token in doc:
+    print(token.text, token.pos_, token.dep_)`
+            },
+            textblob: {
+                title: 'TextBlob',
+                content: `# Instalación básica
+pip install textblob
+
+# Descargar corpus
+python -m textblob.download_corpora
+
+# Soporte en español
+pip install textblob-es
+
+# Ejemplo de uso
+from textblob import TextBlob
+
+texto = TextBlob("Python es un lenguaje increíble")
+print("Sentimiento:", texto.sentiment)
+print("Traducción:", texto.translate(to='es'))`
+            },
+            transformers: {
+                title: 'Transformers (Hugging Face)',
+                content: `# Instalación básica
+pip install transformers
+
+# Con PyTorch
+pip install transformers torch
+
+# Con TensorFlow
+pip install transformers tensorflow
+
+# Ejemplo de chatbot
+from transformers import pipeline
+
+chatbot = pipeline("conversational", 
+                   model="facebook/blenderbot-400M-distill")
+respuesta = chatbot("Hola, ¿cómo estás?")
+print(respuesta)`
+            },
+            rasa: {
+                title: 'Rasa',
+                content: `# Instalación completa
+pip install rasa
+
+# Inicializar proyecto
+rasa init
+
+# Entrenar modelo
+rasa train
+
+# Ejecutar en terminal
+rasa shell
+
+# Ejecutar con API
+rasa run --enable-api
+
+# Dependencias adicionales
+pip install rasa[spacy]
+python -m spacy download es_core_news_md`
+            },
+            chatterbot: {
+                title: 'ChatterBot',
+                content: `# Instalación básica
+pip install chatterbot
+pip install chatterbot-corpus
+
+# Para versiones recientes de Python
+pip install chatterbot==1.0.8
+
+# Ejemplo de uso
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
+
+bot = ChatBot('Laura Bot')
+trainer = ChatterBotCorpusTrainer(bot)
+trainer.train("chatterbot.corpus.spanish")
+
+respuesta = bot.get_response("Hola")
+print(respuesta)`
+            },
+            twilio: {
+                title: 'Twilio (WhatsApp, SMS)',
+                content: `# Instalación
+pip install twilio
+
+# Configuración
+from twilio.rest import Client
+
+account_sid = 'tu_account_sid'
+auth_token = 'tu_auth_token'
+client = Client(account_sid, auth_token)
+
+# Enviar mensaje de WhatsApp
+message = client.messages.create(
+    from_='whatsapp:+14155238886',
+    body='Hola desde mi chatbot',
+    to='whatsapp:+521234567890'
+)
+
+# Para recibir mensajes usar Flask
+pip install flask`
+            },
+            telegram: {
+                title: 'python-telegram-bot',
+                content: `# Instalación
+pip install python-telegram-bot
+
+# Ejemplo básico
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler
+
+async def start(update, context):
+    await update.message.reply_text('¡Hola! Soy tu bot')
+
+async def echo(update, context):
+    await update.message.reply_text(update.message.text)
+
+app = Application.builder().token("TU_TOKEN").build()
+app.add_handler(CommandHandler("start", start))
+app.add_handler(MessageHandler(filters.TEXT, echo))
+
+app.run_polling()`
+            },
+            slack: {
+                title: 'python-slack-sdk',
+                content: `# Instalación
+pip install slack-sdk
+pip install slack-bolt
+
+# Ejemplo con Bolt
+from slack_bolt import App
+
+app = App(
+    token="xoxb-tu-token",
+    signing_secret="tu-signing-secret"
+)
+
+@app.message("hola")
+def message_hello(message, say):
+    say(f"Hola <@{message['user']}>!")
+
+@app.command("/chatbot")
+def command_chatbot(ack, say, command):
+    ack()
+    say(f"Procesando: {command['text']}")
+
+app.start(port=3000)`
+            },
+            flask: {
+                title: 'Flask + Socket.IO',
+                content: `# Instalación
+pip install flask
+pip install flask-socketio
+pip install python-socketio
+
+# Backend (app.py)
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__)
+socketio = SocketIO(app)
+
+@app.route('/')
+def index():
+    return render_template('chat.html')
+
+@socketio.on('message')
+def handle_message(msg):
+    respuesta = f"Bot: Recibí '{msg}'"
+    emit('response', respuesta)
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)`
+            },
+            fastapi: {
+                title: 'FastAPI + WebSockets',
+                content: `# Instalación
+pip install fastapi
+pip install uvicorn[standard]
+pip install websockets
+
+# Ejemplo básico (main.py)
+from fastapi import FastAPI, WebSocket
+from fastapi.responses import HTMLResponse
+
+app = FastAPI()
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        response = f"Bot: {data}"
+        await websocket.send_text(response)
+
+# Ejecutar con
+# uvicorn main:app --reload`
+            },
+            streamlit: {
+                title: 'Streamlit',
+                content: `# Instalación
+pip install streamlit
+
+# Ejemplo de chatbot (app.py)
+import streamlit as st
+
+st.title("💬 Chatbot con Streamlit")
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt := st.chat_input("Escribe tu mensaje"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    
+    response = f"Procesando: {prompt}"
+    st.session_state.messages.append({"role": "assistant", "content": response})
+    with st.chat_message("assistant"):
+        st.markdown(response)
+
+# Ejecutar con: streamlit run app.py`
+            }
+        };
+
+        function showModal(library) {
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modal-body');
+            const data = installations[library];
+            
+            modalBody.innerHTML = `
+                <h2>${data.title}</h2>
+                <pre><code>${data.content.trim()}</code></pre>
+            `;
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
